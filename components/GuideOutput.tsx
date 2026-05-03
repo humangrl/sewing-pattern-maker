@@ -1,14 +1,11 @@
 "use client";
 
-import { useRef } from "react";
-
 interface GuideOutputProps {
   html: string;
   onReset: () => void;
 }
 
 export default function GuideOutput({ html, onReset }: GuideOutputProps) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   function handleDownload() {
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
@@ -21,9 +18,19 @@ export default function GuideOutput({ html, onReset }: GuideOutputProps) {
   }
 
   function handlePrint() {
-    const iframe = iframeRef.current;
-    if (!iframe?.contentWindow) return;
-    iframe.contentWindow.print();
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, "_blank");
+    if (win) {
+      win.addEventListener("load", () => {
+        setTimeout(() => {
+          win.print();
+          URL.revokeObjectURL(url);
+        }, 300);
+      });
+    } else {
+      URL.revokeObjectURL(url);
+    }
   }
 
   return (
@@ -92,12 +99,11 @@ export default function GuideOutput({ html, onReset }: GuideOutputProps) {
       {/* Guide iframe */}
       <div className="flex-1 flex flex-col">
         <iframe
-          ref={iframeRef}
           srcDoc={html}
           title="Sewing Pattern Guide"
           className="flex-1 w-full border-0"
           style={{ minHeight: "calc(100vh - 64px)" }}
-          sandbox="allow-same-origin allow-scripts"
+          sandbox="allow-scripts"
         />
       </div>
     </div>
