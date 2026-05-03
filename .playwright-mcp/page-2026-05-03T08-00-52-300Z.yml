@@ -1,0 +1,70 @@
+- main [ref=e2]:
+  - generic:
+    - img
+    - generic: ✦
+    - generic: +
+    - generic: ✦
+    - generic: ✦
+    - generic: +
+    - img
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - heading "PatternMaker" [level=1] [ref=e5]
+      - paragraph [ref=e6]: Custom sewing patterns from garment images
+    - status [ref=e7]:
+      - generic [ref=e8]: ">>"
+      - text: UPLOAD A GARMENT PHOTO TO BEGIN. STEP 1 OF 6.
+      - generic [ref=e9]: "*"
+    - generic [ref=e10]:
+      - generic [ref=e11]: Visual analysis
+      - generic [ref=e12]: Custom fit
+      - generic [ref=e13]: Material rec.
+      - generic [ref=e14]: Step-by-step
+    - generic [ref=e15]:
+      - tablist "Form steps" [ref=e16]:
+        - 'tab "Step 1: Garment" [selected] [ref=e17]':
+          - generic [ref=e18]: "01"
+          - generic [ref=e19]: Garment
+        - 'tab "Step 2: Use" [ref=e20]':
+          - generic [ref=e21]: "02"
+          - generic [ref=e22]: Use
+        - 'tab "Step 3: Skill" [ref=e23]':
+          - generic [ref=e24]: "03"
+          - generic [ref=e25]: Skill
+        - 'tab "Step 4: Source" [ref=e26]':
+          - generic [ref=e27]: "04"
+          - generic [ref=e28]: Source
+        - 'tab "Step 5: Body" [ref=e29]':
+          - generic [ref=e30]: "05"
+          - generic [ref=e31]: Body
+        - 'tab "Step 6: Fabric" [ref=e32]':
+          - generic [ref=e33]: "06"
+          - generic [ref=e34]: Fabric
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - generic [ref=e38]: GARMENT_REF.JPG
+            - generic [ref=e39]: ⊠
+          - generic [ref=e41]:
+            - heading "Upload Garment Reference" [level=2] [ref=e42]
+            - paragraph [ref=e43]: Share a photo of the garment you want to recreate. A clear, front-facing photo works best.
+            - generic [ref=e44]:
+              - button "UPLOAD_IMAGE.DAT Drop photo here or click to browse · JPEG, PNG, WebP · up to 5MB Choose Image" [ref=e45] [cursor=pointer]:
+                - generic [ref=e46]:
+                  - generic [ref=e47]: UPLOAD_IMAGE.DAT
+                  - generic [ref=e48]: ⊠
+                - generic [ref=e49]:
+                  - generic [ref=e50]: Drop photo here
+                  - paragraph [ref=e51]: or click to browse · JPEG, PNG, WebP · up to 5MB
+                  - generic: Choose Image
+              - paragraph [ref=e52]: "Tip: A clear, well-lit photo from the front gives the best results."
+        - generic [ref=e53]:
+          - button "← Back" [disabled] [ref=e54]
+          - button "Next →" [disabled] [ref=e55]
+    - paragraph [ref=e57]:
+      - text: Built with
+      - link "Claude AI" [ref=e58] [cursor=pointer]:
+        - /url: https://www.anthropic.com
+      - text: ·
+      - link "GitHub" [ref=e59] [cursor=pointer]:
+        - /url: https://github.com/humangrl/sewing-pattern-maker

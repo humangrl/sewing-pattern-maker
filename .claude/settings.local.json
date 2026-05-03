@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\amell\\\\code\\\\sewing-pattern-maker\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(grep -E \"\\\\.\\(json|mjs|ts|tsx|js\\)$\")",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "mcp__plugin_playwright_playwright__browser_navigate"
+    ]
+  }
+}
