@@ -19,24 +19,30 @@ interface PatternMakerFormProps {
 
 const TOTAL_STEPS = 6;
 
+const STEP_TITLES = [
+  "GARMENT_REF.JPG",
+  "USE_CASE.TXT",
+  "SKILL_LEVEL.CFG",
+  "MEASURE_SRC.DAT",
+  "MEASUREMENTS.TXT",
+  "MATERIAL.DAT",
+];
+
 const EXPERIENCE_LEVELS = [
   {
     value: "beginner",
     label: "Beginner",
-    desc: "New to sewing, comfortable with basic straight seams",
-    icon: "🌱",
+    desc:  "New to sewing, comfortable with basic straight seams",
   },
   {
     value: "intermediate",
     label: "Intermediate",
-    desc: "Confident with patterns, zippers, and set-in sleeves",
-    icon: "✂️",
+    desc:  "Confident with patterns, zippers, and set-in sleeves",
   },
   {
     value: "advanced",
     label: "Advanced",
-    desc: "Experienced with tailoring, couture techniques, and drafting",
-    icon: "🎓",
+    desc:  "Experienced with tailoring, couture techniques, and drafting",
   },
 ];
 
@@ -44,14 +50,12 @@ const MEASUREMENT_SOURCES = [
   {
     value: "body",
     label: "Body measurements",
-    desc: "I will measure my own body",
-    icon: "📏",
+    desc:  "I will measure my own body",
   },
   {
     value: "reference",
     label: "Reference garment",
-    desc: "I have a well-fitting garment to measure",
-    icon: "👔",
+    desc:  "I have a well-fitting garment to measure",
   },
 ];
 
@@ -73,43 +77,30 @@ export default function PatternMakerForm({
   onError,
   isGenerating,
 }: PatternMakerFormProps) {
-  const [step, setStep] = useState(1);
-  const [image, setImage] = useState<ImageData | null>(null);
-  const [intendedUse, setIntendedUse] = useState("");
-  const [experience, setExperience] = useState("");
+  const [step, setStep]                         = useState(1);
+  const [image, setImage]                       = useState<ImageData | null>(null);
+  const [intendedUse, setIntendedUse]           = useState("");
+  const [experience, setExperience]             = useState("");
   const [measurementSource, setMeasurementSource] = useState("");
-  const [measurements, setMeasurements] = useState("");
-  const [material, setMaterial] = useState("");
-  const [letAiChoose, setLetAiChoose] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [measurements, setMeasurements]         = useState("");
+  const [material, setMaterial]                 = useState("");
+  const [letAiChoose, setLetAiChoose]           = useState(false);
+  const [errorMsg, setErrorMsg]                 = useState<string | null>(null);
 
   function canAdvance(): boolean {
     switch (step) {
-      case 1:
-        return image !== null;
-      case 2:
-        return intendedUse.trim().length > 0;
-      case 3:
-        return experience !== "";
-      case 4:
-        return measurementSource !== "";
-      case 5:
-        return measurements.trim().length > 0;
-      case 6:
-        return letAiChoose || material.trim().length > 0;
-      default:
-        return false;
+      case 1: return image !== null;
+      case 2: return intendedUse.trim().length > 0;
+      case 3: return experience !== "";
+      case 4: return measurementSource !== "";
+      case 5: return measurements.trim().length > 0;
+      case 6: return letAiChoose || material.trim().length > 0;
+      default: return false;
     }
   }
 
-  function handleNext() {
-    if (step < TOTAL_STEPS) setStep((s) => s + 1);
-  }
-
-  function handleBack() {
-    if (step > 1) setStep((s) => s - 1);
-    setErrorMsg(null);
-  }
+  function handleNext() { if (step < TOTAL_STEPS) setStep((s) => s + 1); }
+  function handleBack() { if (step > 1) { setStep((s) => s - 1); setErrorMsg(null); } }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -121,13 +112,13 @@ export default function PatternMakerForm({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          imageBase64: image!.base64,
-          imageMimeType: image!.mimeType,
+          imageBase64:        image!.base64,
+          imageMimeType:      image!.mimeType,
           intendedUse,
-          sewingExperience: experience,
+          sewingExperience:   experience,
           measurementSource,
-          bodyMeasurements: measurements,
-          materialChoice: letAiChoose ? "" : material,
+          bodyMeasurements:   measurements,
+          materialChoice:     letAiChoose ? "" : material,
           letAiChooseMaterial: letAiChoose,
         }),
       });
@@ -139,7 +130,6 @@ export default function PatternMakerForm({
         );
       }
 
-      // Read the streaming response
       const reader = response.body?.getReader();
       if (!reader) throw new Error("No response body.");
 
@@ -151,7 +141,6 @@ export default function PatternMakerForm({
         html += decoder.decode(value, { stream: true });
       }
 
-      // Strip markdown fences if Claude wrapped the HTML
       const cleaned = html
         .replace(/^```html\s*/i, "")
         .replace(/```\s*$/, "")
@@ -159,8 +148,7 @@ export default function PatternMakerForm({
 
       onComplete(cleaned);
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "An unexpected error occurred.";
+      const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
       setErrorMsg(msg);
       onError();
     }
@@ -168,284 +156,288 @@ export default function PatternMakerForm({
 
   return (
     <div>
+      {/* Folder tab step indicator */}
       <StepIndicator currentStep={step} totalSteps={TOTAL_STEPS} />
 
       <form onSubmit={handleSubmit}>
-        {/* Step 1: Garment Image */}
-        {step === 1 && (
-          <div className="step-card">
-            <h2 className="font-serif text-2xl font-semibold text-primary-10 mb-2">
-              Upload Your Garment Reference
-            </h2>
-            <p className="text-neutral-50 text-sm mb-6">
-              Share a photo of the garment you want to recreate. A clear,
-              front-facing photo works best.
-            </p>
-            <ImageUpload value={image} onChange={setImage} />
+        {/* Window card — tabs connect visually to the blue chrome bar */}
+        <div className="win">
+          <div className="win-chrome">
+            <span className="truncate">{STEP_TITLES[step - 1]}</span>
+            <span className="win-chrome-close" aria-hidden="true">⊠</span>
           </div>
-        )}
 
-        {/* Step 2: Intended Use */}
-        {step === 2 && (
-          <div className="step-card">
-            <h2 className="font-serif text-2xl font-semibold text-primary-10 mb-2">
-              How Will You Wear This?
-            </h2>
-            <p className="text-neutral-50 text-sm mb-6">
-              Knowing the intended use helps tailor the construction method,
-              fabric weight, and finishing details.
-            </p>
-            <label className="label-text" htmlFor="intended-use">
-              Intended Use
-            </label>
-            <textarea
-              id="intended-use"
-              value={intendedUse}
-              onChange={(e) => setIntendedUse(e.target.value)}
-              className="input-field min-h-[120px] resize-y"
-              placeholder="e.g. Everyday casual wear, summer wedding guest outfit, workwear for an office environment, theatrical costume..."
-              autoFocus
-            />
-            <div className="mt-4 flex flex-wrap gap-2">
-              {[
-                "Everyday casual",
-                "Formal / special occasion",
-                "Workwear",
-                "Activewear",
-                "Costume / theatrical",
-                "Seasonal (summer/winter)",
-              ].map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setIntendedUse(s)}
-                  className="text-xs px-3 py-1.5 rounded-full border border-primary-80 text-primary-40 hover:bg-primary-95 transition-colors"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+          <div className="win-body step-card">
 
-        {/* Step 3: Experience Level */}
-        {step === 3 && (
-          <div className="step-card">
-            <h2 className="font-serif text-2xl font-semibold text-primary-10 mb-2">
-              What&apos;s Your Sewing Experience?
-            </h2>
-            <p className="text-neutral-50 text-sm mb-6">
-              The guide will be tailored to your skill level, offering
-              simplified or advanced construction options.
-            </p>
-            <div className="space-y-3">
-              {EXPERIENCE_LEVELS.map((lvl) => (
-                <button
-                  key={lvl.value}
-                  type="button"
-                  onClick={() => setExperience(lvl.value)}
-                  className={`w-full text-left flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 ${
-                    experience === lvl.value
-                      ? "border-primary-40 bg-primary-95 shadow-md"
-                      : "border-neutral-90 bg-white hover:border-primary-70 hover:bg-primary-99"
-                  }`}
-                >
-                  <span className="text-2xl mt-0.5">{lvl.icon}</span>
-                  <div>
-                    <p
-                      className={`font-semibold ${
-                        experience === lvl.value
-                          ? "text-primary-30"
-                          : "text-neutral-10"
-                      }`}
-                    >
-                      {lvl.label}
-                    </p>
-                    <p className="text-sm text-neutral-50">{lvl.desc}</p>
-                  </div>
-                  {experience === lvl.value && (
-                    <span className="ml-auto text-primary-40 text-lg self-center">
-                      ✓
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: Measurement Source */}
-        {step === 4 && (
-          <div className="step-card">
-            <h2 className="font-serif text-2xl font-semibold text-primary-10 mb-2">
-              Where Will Your Measurements Come From?
-            </h2>
-            <p className="text-neutral-50 text-sm mb-6">
-              Body measurements give the most accurate custom fit. A reference
-              garment can also work if it fits you well.
-            </p>
-            <div className="space-y-3">
-              {MEASUREMENT_SOURCES.map((src) => (
-                <button
-                  key={src.value}
-                  type="button"
-                  onClick={() => setMeasurementSource(src.value)}
-                  className={`w-full text-left flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 ${
-                    measurementSource === src.value
-                      ? "border-primary-40 bg-primary-95 shadow-md"
-                      : "border-neutral-90 bg-white hover:border-primary-70 hover:bg-primary-99"
-                  }`}
-                >
-                  <span className="text-2xl mt-0.5">{src.icon}</span>
-                  <div>
-                    <p
-                      className={`font-semibold ${
-                        measurementSource === src.value
-                          ? "text-primary-30"
-                          : "text-neutral-10"
-                      }`}
-                    >
-                      {src.label}
-                    </p>
-                    <p className="text-sm text-neutral-50">{src.desc}</p>
-                  </div>
-                  {measurementSource === src.value && (
-                    <span className="ml-auto text-primary-40 text-lg self-center">
-                      ✓
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Step 5: Body Measurements */}
-        {step === 5 && (
-          <div className="step-card">
-            <h2 className="font-serif text-2xl font-semibold text-primary-10 mb-2">
-              Enter Your Measurements
-            </h2>
-            <p className="text-neutral-50 text-sm mb-6">
-              Include all relevant measurements. Both imperial and metric are
-              accepted. The more detail, the more accurate your pattern.
-            </p>
-
-            {/* Quick reference */}
-            <details className="mb-4 bg-primary-99 border border-primary-90 rounded-xl overflow-hidden">
-              <summary className="px-4 py-3 cursor-pointer text-sm font-semibold text-primary-40 list-none flex items-center justify-between">
-                <span>📏 Measurement guide &amp; landmarks</span>
-                <span className="text-neutral-50 font-normal">tap to expand</span>
-              </summary>
-              <div className="px-4 pb-4 pt-2 text-xs text-neutral-50 space-y-1 border-t border-primary-90">
-                <p><strong className="text-neutral-10">Bust:</strong> fullest part of the chest, arms relaxed</p>
-                <p><strong className="text-neutral-10">Waist:</strong> natural waist, narrowest point of the torso</p>
-                <p><strong className="text-neutral-10">Hip:</strong> fullest part of the hips, ~7–9 in below waist</p>
-                <p><strong className="text-neutral-10">Shoulder width:</strong> across the back from shoulder point to shoulder point</p>
-                <p><strong className="text-neutral-10">Back length:</strong> nape of neck down to natural waist</p>
-                <p><strong className="text-neutral-10">Sleeve length:</strong> shoulder point to wrist bone, arm slightly bent</p>
-                <p><strong className="text-neutral-10">Inseam:</strong> crotch to floor or desired hem length</p>
-              </div>
-            </details>
-
-            <label className="label-text" htmlFor="measurements">
-              Your Measurements
-            </label>
-            <textarea
-              id="measurements"
-              value={measurements}
-              onChange={(e) => setMeasurements(e.target.value)}
-              className="input-field min-h-[220px] resize-y font-mono text-sm"
-              placeholder={MEASUREMENT_HINTS}
-              autoFocus
-            />
-          </div>
-        )}
-
-        {/* Step 6: Material Choice */}
-        {step === 6 && (
-          <div className="step-card">
-            <h2 className="font-serif text-2xl font-semibold text-primary-10 mb-2">
-              Choose Your Fabric
-            </h2>
-            <p className="text-neutral-50 text-sm mb-6">
-              Specify a fabric if you have one in mind, or let the AI analyze
-              your garment image and recommend the best choice.
-            </p>
-
-            {/* Let AI decide toggle */}
-            <label className="flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer mb-4 transition-all duration-200 border-primary-40 bg-primary-95">
-              <input
-                type="checkbox"
-                checked={letAiChoose}
-                onChange={(e) => setLetAiChoose(e.target.checked)}
-                className="mt-0.5 w-5 h-5 accent-primary-40"
-              />
+            {/* ── Step 1: Garment Image ─────────────── */}
+            {step === 1 && (
               <div>
-                <p className="font-semibold text-primary-30">
-                  Let the AI recommend the best material 🧵
+                <h2 className="wordmark text-xl mb-1">Upload Garment Reference</h2>
+                <p className="text-sm text-hg-text-2 mb-5 font-body">
+                  Share a photo of the garment you want to recreate. A clear,
+                  front-facing photo works best.
                 </p>
-                <p className="text-sm text-neutral-50 mt-0.5">
-                  Claude will analyze the garment image and suggest the ideal
-                  fabric(s) with full rationale.
-                </p>
+                <ImageUpload value={image} onChange={setImage} />
               </div>
-            </label>
+            )}
 
-            {!letAiChoose && (
-              <div className="animate-slide-up">
-                <label className="label-text" htmlFor="material">
-                  Fabric / Material
+            {/* ── Step 2: Intended Use ──────────────── */}
+            {step === 2 && (
+              <div>
+                <h2 className="wordmark text-xl mb-1">How Will You Wear This?</h2>
+                <p className="text-sm text-hg-text-2 mb-5 font-body">
+                  Knowing the intended use helps tailor construction method,
+                  fabric weight, and finishing details.
+                </p>
+                <label className="label-text" htmlFor="intended-use">
+                  Intended Use
                 </label>
-                <input
-                  id="material"
-                  type="text"
-                  value={material}
-                  onChange={(e) => setMaterial(e.target.value)}
-                  className="input-field"
-                  placeholder="e.g. Cotton poplin, linen, silk charmeuse, ponte knit..."
-                  autoFocus={!letAiChoose}
+                <textarea
+                  id="intended-use"
+                  value={intendedUse}
+                  onChange={(e) => setIntendedUse(e.target.value)}
+                  className="input-field min-h-[100px]"
+                  placeholder="e.g. Everyday casual wear, summer wedding guest outfit, theatrical costume…"
+                  autoFocus
                 />
                 <div className="mt-3 flex flex-wrap gap-2">
                   {[
-                    "Cotton poplin",
-                    "Linen",
-                    "Jersey knit",
-                    "Denim",
-                    "Silk charmeuse",
-                    "Ponte knit",
-                    "Wool crepe",
-                    "Chiffon",
-                  ].map((fab) => (
+                    "Everyday casual",
+                    "Formal / special occasion",
+                    "Workwear",
+                    "Activewear",
+                    "Costume / theatrical",
+                    "Seasonal (summer/winter)",
+                  ].map((s) => (
                     <button
-                      key={fab}
+                      key={s}
                       type="button"
-                      onClick={() => setMaterial(fab)}
-                      className="text-xs px-3 py-1.5 rounded-full border border-primary-80 text-primary-40 hover:bg-primary-95 transition-colors"
+                      onClick={() => setIntendedUse(s)}
+                      className={`tag-btn ${intendedUse === s ? "tag-btn--active" : ""}`}
                     >
-                      {fab}
+                      {s}
                     </button>
                   ))}
                 </div>
               </div>
             )}
+
+            {/* ── Step 3: Experience Level ──────────── */}
+            {step === 3 && (
+              <div>
+                <h2 className="wordmark text-xl mb-1">Sewing Experience?</h2>
+                <p className="text-sm text-hg-text-2 mb-5 font-body">
+                  The guide will be tailored to your skill level — simplified or
+                  advanced construction as needed.
+                </p>
+                <div className="space-y-2">
+                  {EXPERIENCE_LEVELS.map((lvl) => (
+                    <button
+                      key={lvl.value}
+                      type="button"
+                      onClick={() => setExperience(lvl.value)}
+                      className={`door-btn ${experience === lvl.value ? "door-btn--active" : ""}`}
+                    >
+                      <span className="door-btn__badge" aria-hidden="true">→</span>
+                      <span className="door-btn__body">
+                        <span className="door-btn__label">{lvl.label}</span>
+                        <span className="door-btn__desc">{lvl.desc}</span>
+                      </span>
+                      {experience === lvl.value && (
+                        <span className="door-btn__check" aria-hidden="true">✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── Step 4: Measurement Source ────────── */}
+            {step === 4 && (
+              <div>
+                <h2 className="wordmark text-xl mb-1">Measurement Source?</h2>
+                <p className="text-sm text-hg-text-2 mb-5 font-body">
+                  Body measurements give the most accurate custom fit. A reference
+                  garment works too if it fits you well.
+                </p>
+                <div className="space-y-2">
+                  {MEASUREMENT_SOURCES.map((src) => (
+                    <button
+                      key={src.value}
+                      type="button"
+                      onClick={() => setMeasurementSource(src.value)}
+                      className={`door-btn ${measurementSource === src.value ? "door-btn--active" : ""}`}
+                    >
+                      <span className="door-btn__badge" aria-hidden="true">→</span>
+                      <span className="door-btn__body">
+                        <span className="door-btn__label">{src.label}</span>
+                        <span className="door-btn__desc">{src.desc}</span>
+                      </span>
+                      {measurementSource === src.value && (
+                        <span className="door-btn__check" aria-hidden="true">✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── Step 5: Body Measurements ─────────── */}
+            {step === 5 && (
+              <div>
+                <h2 className="wordmark text-xl mb-1">Enter Your Measurements</h2>
+                <p className="text-sm text-hg-text-2 mb-4 font-body">
+                  Include all relevant measurements. Both imperial and metric are
+                  accepted. More detail = more accurate pattern.
+                </p>
+
+                {/* Reference guide — inner window */}
+                <details className="win-inner mb-4">
+                  <summary className="win-inner-chrome cursor-pointer list-none select-none">
+                    <span>MEASURE_GUIDE.TXT</span>
+                    <span aria-hidden="true" className="opacity-60">▾</span>
+                  </summary>
+                  <div className="win-inner-body text-xs text-hg-text-2 space-y-1 font-body">
+                    <p><strong className="text-hg-text">Bust:</strong> fullest part of the chest, arms relaxed</p>
+                    <p><strong className="text-hg-text">Waist:</strong> natural waist, narrowest point of the torso</p>
+                    <p><strong className="text-hg-text">Hip:</strong> fullest part of hips, ~7–9 in below waist</p>
+                    <p><strong className="text-hg-text">Shoulder width:</strong> back, point to point</p>
+                    <p><strong className="text-hg-text">Back length:</strong> nape of neck to natural waist</p>
+                    <p><strong className="text-hg-text">Sleeve length:</strong> shoulder to wrist, arm slightly bent</p>
+                    <p><strong className="text-hg-text">Inseam:</strong> crotch to floor or desired hem</p>
+                  </div>
+                </details>
+
+                <label className="label-text" htmlFor="measurements">
+                  Your Measurements
+                </label>
+                <textarea
+                  id="measurements"
+                  value={measurements}
+                  onChange={(e) => setMeasurements(e.target.value)}
+                  className="input-field min-h-[200px] font-mono text-sm"
+                  placeholder={MEASUREMENT_HINTS}
+                  autoFocus
+                />
+              </div>
+            )}
+
+            {/* ── Step 6: Material Choice ───────────── */}
+            {step === 6 && (
+              <div>
+                <h2 className="wordmark text-xl mb-1">Choose Your Fabric</h2>
+                <p className="text-sm text-hg-text-2 mb-5 font-body">
+                  Specify a fabric if you have one in mind, or let the AI analyze
+                  your garment image and recommend the best choice.
+                </p>
+
+                {/* AI toggle — styled as a door button with checkbox */}
+                <label
+                  className={`door-btn mb-4 ${letAiChoose ? "door-btn--active" : ""}`}
+                  style={{ cursor: "pointer" }}
+                >
+                  <span
+                    className="door-btn__badge"
+                    aria-hidden="true"
+                    style={{ background: letAiChoose ? "var(--lime-dk)" : "var(--blue)" }}
+                  >
+                    {letAiChoose ? "✓" : "AI"}
+                  </span>
+                  <span className="door-btn__body">
+                    <span className="door-btn__label">Let AI recommend material</span>
+                    <span className="door-btn__desc">
+                      Claude will analyse the garment image and suggest the ideal
+                      fabric(s) with full rationale.
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={letAiChoose}
+                    onChange={(e) => setLetAiChoose(e.target.checked)}
+                    className="sr-only"
+                  />
+                </label>
+
+                {!letAiChoose && (
+                  <div className="animate-fade-in">
+                    <label className="label-text" htmlFor="material">
+                      Fabric / Material
+                    </label>
+                    <input
+                      id="material"
+                      type="text"
+                      value={material}
+                      onChange={(e) => setMaterial(e.target.value)}
+                      className="input-field"
+                      placeholder="e.g. Cotton poplin, linen, silk charmeuse, ponte knit…"
+                      autoFocus={!letAiChoose}
+                    />
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {[
+                        "Cotton poplin",
+                        "Linen",
+                        "Jersey knit",
+                        "Denim",
+                        "Silk charmeuse",
+                        "Ponte knit",
+                        "Wool crepe",
+                        "Chiffon",
+                      ].map((fab) => (
+                        <button
+                          key={fab}
+                          type="button"
+                          onClick={() => setMaterial(fab)}
+                          className={`tag-btn ${material === fab ? "tag-btn--active" : ""}`}
+                        >
+                          {fab}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Error */}
+            {errorMsg && (
+              <div className="error-box mt-4">
+                <strong>Error:</strong> {errorMsg}
+              </div>
+            )}
+
+          </div>{/* /win-body */}
+        </div>{/* /win */}
+
+        {/* ── Generating window ──────────────────── */}
+        {isGenerating && (
+          <div className="win mt-4 animate-fade-in">
+            <div className="win-chrome">
+              <span>ANALYZING.EXE</span>
+              <span className="win-chrome-close" aria-hidden="true">⊠</span>
+            </div>
+            <div className="win-body text-center py-6">
+              <div
+                className="text-hg-blue-dk mb-2 uppercase tracking-wide"
+                style={{ fontFamily: "'VT323', monospace", fontSize: "1.1rem" }}
+              >
+                Drafting your pattern
+                <span className="blink-cursor">&nbsp;_</span>
+              </div>
+              <p className="text-sm text-hg-text-2 font-body max-w-sm mx-auto leading-relaxed">
+                Claude is examining design details, calculating pattern pieces,
+                and writing your custom sewing guide. Usually 20–60 seconds.
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Error message */}
-        {errorMsg && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 animate-fade-in">
-            <strong>Error:</strong> {errorMsg}
-          </div>
-        )}
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-6">
+        {/* ── Navigation buttons ─────────────────── */}
+        <div className="flex items-center justify-between mt-4">
           <button
             type="button"
             onClick={handleBack}
             disabled={step === 1 || isGenerating}
-            className="btn-secondary disabled:opacity-40 disabled:cursor-not-allowed"
+            className="btn-secondary"
           >
             ← Back
           </button>
@@ -455,7 +447,7 @@ export default function PatternMakerForm({
               type="button"
               onClick={handleNext}
               disabled={!canAdvance()}
-              className="btn-primary disabled:opacity-50"
+              className="btn-primary"
             >
               Next →
             </button>
@@ -463,22 +455,20 @@ export default function PatternMakerForm({
             <button
               type="submit"
               disabled={!canAdvance() || isGenerating}
-              className="btn-primary disabled:opacity-50 flex items-center gap-2"
+              className="btn-primary"
             >
               {isGenerating ? (
                 <>
                   <svg
-                    className="animate-spin h-4 w-4"
+                    className="animate-spin-slow h-3.5 w-3.5"
                     viewBox="0 0 24 24"
                     fill="none"
+                    aria-hidden="true"
                   >
                     <circle
                       className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
+                      cx="12" cy="12" r="10"
+                      stroke="currentColor" strokeWidth="4"
                     />
                     <path
                       className="opacity-75"
@@ -486,34 +476,22 @@ export default function PatternMakerForm({
                       d="M4 12a8 8 0 018-8v8H4z"
                     />
                   </svg>
-                  Generating Pattern…
+                  Generating…
                 </>
               ) : (
-                <>✨ Generate My Pattern</>
+                "Generate Pattern →"
               )}
             </button>
           )}
         </div>
 
-        {/* Progress hint on last step */}
         {step === TOTAL_STEPS && !isGenerating && (
-          <p className="text-center text-xs text-neutral-50 mt-3">
-            Generation typically takes 20–60 seconds depending on garment complexity.
+          <p
+            className="text-center mt-3 text-hg-muted"
+            style={{ fontFamily: "'VT323', monospace", fontSize: "0.9rem" }}
+          >
+            Generation typically takes 20–60 seconds.
           </p>
-        )}
-
-        {isGenerating && (
-          <div className="mt-6 p-6 bg-primary-99 border border-primary-90 rounded-2xl text-center animate-fade-in">
-            <div className="text-3xl mb-3">🧵</div>
-            <p className="font-semibold text-primary-30 mb-1">
-              Analyzing garment &amp; drafting your pattern…
-            </p>
-            <p className="text-sm text-neutral-50">
-              Claude is examining the design details, calculating pattern pieces,
-              and writing your custom sewing guide. This usually takes 20–60
-              seconds.
-            </p>
-          </div>
         )}
       </form>
     </div>

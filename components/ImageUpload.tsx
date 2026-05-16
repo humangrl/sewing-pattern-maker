@@ -19,7 +19,6 @@ export default function ImageUpload({ value, onChange }: ImageUploadProps) {
 
   function processFile(file: File) {
     setError(null);
-
     if (!ACCEPTED_TYPES.includes(file.type)) {
       setError("Please upload a JPEG, PNG, WebP, or GIF image.");
       return;
@@ -28,11 +27,9 @@ export default function ImageUpload({ value, onChange }: ImageUploadProps) {
       setError(`Image must be smaller than ${MAX_SIZE_MB}MB.`);
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
-      // Strip the data URL prefix to get raw base64
       const base64 = dataUrl.split(",")[1];
       onChange({ base64, mimeType: file.type, previewUrl: dataUrl });
     };
@@ -59,23 +56,34 @@ export default function ImageUpload({ value, onChange }: ImageUploadProps) {
 
   if (value) {
     return (
-      <div className="relative group rounded-2xl overflow-hidden border-2 border-primary-80 shadow-md animate-fade-in">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={value.previewUrl}
-          alt="Garment reference"
-          className="w-full max-h-96 object-contain bg-neutral-95"
-        />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+      <div className="win-inner animate-fade-in">
+        <div className="win-inner-chrome">
+          <span>GARMENT_REF.JPG</span>
           <button
             onClick={handleRemove}
-            className="bg-white text-red-600 font-semibold px-4 py-2 rounded-xl shadow-lg hover:bg-red-50 transition-colors"
+            className="text-hg-blue-dk hover:text-red-700 transition-colors"
+            aria-label="Remove image"
+            style={{ fontFamily: "'VT323', monospace", fontSize: "0.85rem" }}
           >
-            Remove image
+            REMOVE ×
           </button>
         </div>
-        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-primary-40 text-xs font-semibold px-3 py-1 rounded-full border border-primary-80">
-          ✓ Image uploaded
+        <div className="win-inner-body p-0 relative group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={value.previewUrl}
+            alt="Garment reference"
+            className="w-full max-h-72 object-contain"
+            style={{ background: "var(--bg-sun)" }}
+          />
+          <div className="absolute bottom-2 left-2">
+            <span
+              className="tag-btn tag-btn--active"
+              style={{ fontSize: "0.8rem", padding: "1px 8px", cursor: "default" }}
+            >
+              ✓ uploaded
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -89,27 +97,44 @@ export default function ImageUpload({ value, onChange }: ImageUploadProps) {
         onClick={() => inputRef.current?.click()}
         onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
         onDrop={handleDrop}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
+        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
-        className={`relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200 ${
-          isDragging
-            ? "border-primary-40 bg-primary-95 scale-[1.01]"
-            : "border-neutral-90 hover:border-primary-70 hover:bg-primary-99 bg-white"
-        }`}
+        className="win-inner"
+        style={{
+          borderStyle: isDragging ? "solid" : "dashed",
+          borderColor: isDragging ? "var(--blue)" : "var(--blue-lt)",
+          transition: "border-color 0.12s ease",
+          cursor: "pointer",
+        }}
       >
-        <div className="text-5xl mb-4">📷</div>
-        <p className="font-semibold text-neutral-10 mb-1">
-          Drop your garment photo here
-        </p>
-        <p className="text-sm text-neutral-50 mb-4">
-          or click to browse · JPEG, PNG, WebP · up to {MAX_SIZE_MB}MB
-        </p>
-        <span className="btn-primary text-sm px-4 py-2 pointer-events-none inline-block">
-          Choose Image
-        </span>
+        <div
+          className="win-inner-chrome"
+          style={{ background: isDragging ? "var(--blue)" : undefined }}
+        >
+          <span style={{ color: isDragging ? "var(--surface)" : undefined }}>
+            UPLOAD_IMAGE.DAT
+          </span>
+          <span aria-hidden="true" style={{ color: isDragging ? "var(--lime)" : undefined }}>⊠</span>
+        </div>
+        <div className="win-inner-body text-center py-8">
+          <div
+            className="text-hg-blue-dk mb-3"
+            style={{
+              fontFamily: "'VT323', monospace",
+              fontSize: "1.4rem",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+            }}
+          >
+            {isDragging ? "Drop to upload" : "Drop photo here"}
+          </div>
+          <p className="text-sm text-hg-text-2 font-body mb-4">
+            or click to browse · JPEG, PNG, WebP · up to {MAX_SIZE_MB}MB
+          </p>
+          <span className="btn-primary" style={{ pointerEvents: "none" }}>
+            Choose Image
+          </span>
+        </div>
       </div>
 
       <input
@@ -122,12 +147,16 @@ export default function ImageUpload({ value, onChange }: ImageUploadProps) {
       />
 
       {error && (
-        <p className="mt-2 text-sm text-red-600 font-medium">{error}</p>
+        <p
+          className="mt-2 text-red-700"
+          style={{ fontFamily: "'VT323', monospace", fontSize: "0.95rem" }}
+        >
+          {error}
+        </p>
       )}
 
-      <p className="mt-3 text-xs text-neutral-50">
+      <p className="mt-3 text-xs text-hg-muted font-body">
         Tip: A clear, well-lit photo from the front gives the best results.
-        Multiple angles are helpful too.
       </p>
     </div>
   );
